@@ -1,0 +1,6 @@
+E:\Documents\coding\c-charp-1\c-charp-1\bin\Debug\c-charp-1.exe.config
+E:\Documents\coding\c-charp-1\c-charp-1\bin\Debug\c-charp-1.exe
+E:\Documents\coding\c-charp-1\c-charp-1\bin\Debug\c-charp-1.pdb
+E:\Documents\coding\c-charp-1\c-charp-1\obj\Debug\c-charp-1.csprojResolveAssemblyReference.cache
+E:\Documents\coding\c-charp-1\c-charp-1\obj\Debug\c-charp-1.exe
+E:\Documents\coding\c-charp-1\c-charp-1\obj\Debug\c-charp-1.pdb
