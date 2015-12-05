@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace c_charp_1
+namespace c_charp_1.messages
 {
     class BinaryProtocolMessage
     {
@@ -27,7 +27,7 @@ namespace c_charp_1
             this._bytebuffer = new ByteBuffer(data);
             this.packetLength = this._bytebuffer.readUInt32();
             this.paddingLength = this._bytebuffer.readByte();
-            this._payload = new ByteBuffer(this._bytebuffer.readBytes(this.paddingLength));
+            this._payload = new ByteBuffer(this._bytebuffer.readBytes((Int32)this.paddingLength));
         }
 
     }

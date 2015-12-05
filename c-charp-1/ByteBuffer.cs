@@ -97,6 +97,33 @@ namespace c_charp_1
             }
         }
 
+        public String[] readNameList()
+        {
+            if (this._buffer == null)
+            {
+                throw new NullReferenceException();
+            }
+            else if (this.pos < this._buffer.Length)
+            {
+                UInt32 length = this.readUInt32();
+
+                if (length == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    String tmp = Encoding.ASCII.GetString(this.readBytes((Int32)length));
+
+                    return tmp.Split(',');
+                }
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
         public void skipBytes(Int32 n)
         {
             if (this._buffer == null)
@@ -106,6 +133,25 @@ namespace c_charp_1
             else if (this.pos + n < this._buffer.Length)
             {
                 this.pos += n;
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
+        public Boolean readBoolean()
+        {
+            if (this._buffer == null)
+            {
+                throw new NullReferenceException();
+            }
+            else if (this.pos < this._buffer.Length)
+            {
+                Byte res = this._buffer[this.pos];
+                ++this.pos;
+
+                return (res != 0);
             }
             else
             {
