@@ -18,6 +18,11 @@ namespace c_charp_1
 
         private String[] names;
 
+        public NameList(Byte[] data)
+        {
+
+        }
+
 
     }
 }

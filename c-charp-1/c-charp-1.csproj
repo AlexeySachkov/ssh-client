@@ -46,6 +46,7 @@
     <Compile Include="KeyExchangeInitMessage.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MessageCodes.cs" />
+    <Compile Include="NameList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
