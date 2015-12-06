@@ -198,6 +198,60 @@ namespace c_charp_1
                         }
 
                         Console.WriteLine(String.Format("\nfirst_kex_packet_follows: {0}", first_kex_packet_follows));
+
+
+                        Writer writer = new Writer();
+
+                        writer.writeByte(SSH_MSG_KEXINIT);
+                        for (int i = 0; i < 16; ++i)
+                        {
+                            writer.writeByte((Byte)(new Random()).Next(32, 128));
+                        }
+                        writer.writeNameList(kex_algoritmhs);
+                        writer.writeNameList(server_host_key_algorithms);
+                        writer.writeNameList(encryption_algorithms_client_to_server);
+                        writer.writeNameList(encryption_algorithms_server_to_client);
+                        writer.writeNameList(mac_algorithms_client_to_server);
+                        writer.writeNameList(mac_algorithms_server_to_client);
+                        writer.writeNameList(compression_algorithms_client_to_server);
+                        writer.writeNameList(compression_algorithms_server_to_client);
+                        writer.writeNameList(languages_client_to_server);
+                        writer.writeNameList(languages_server_to_client);
+                        //writer.writeBoolean(true);
+                        //writer.writeUint32(0);
+
+
+                        Byte[] msg = writer.getData();
+
+                        Writer writer1 = new Writer();
+                        writer1.writeUint32((UInt32)msg.Length + 1u);
+                        writer1.writeByte(4);
+                        writer1.writeBytes(msg);
+                        /*for (int i = 0; i < 4; ++i)
+                        {
+                            writer1.writeByte((Byte)(new Random()).Next(32, 128));
+                        }*/
+
+                        Byte[] rrr = writer1.getData();
+
+                        Console.WriteLine(Encoding.ASCII.GetString(data));
+                        Console.WriteLine(Encoding.ASCII.GetString(rrr));
+
+                        Console.WriteLine("beforeSend");
+                        socket.Send(data);
+                        Console.WriteLine("afterSend");
+
+                        Byte[] r = new Byte[100500];
+
+                        received = socket.Receive(r);
+                        Reader rr = new Reader(r);
+                        UInt32 ll = rr.readUInt32();
+                        for (int i = 0; i < ll; ++i)
+                        {
+                            Console.WriteLine(String.Format("r[{0}] = {1} : {2}", i, r[i], (char)r[i]));
+                        }
+                        Console.WriteLine(Encoding.ASCII.GetString(r));
+
                     }
                     else
                     {
@@ -218,12 +272,113 @@ namespace c_charp_1
         }
     }
 
+    class Writer
+    {
+        private Byte[] data;
+
+        public Byte[] getData()
+        {
+            Byte[] tmpArray = new Byte[this.length];
+            Array.Copy(this.data, tmpArray, this.length);
+            return tmpArray;
+        }
+
+        private Int32 length;
+
+        public Int32 getLength()
+        {
+            return this.length;
+        }
+        private Int32 capacity;
+
+        public Writer()
+        {
+            this.data = new Byte[100];
+            this.capacity = 100;
+            this.length = 0;
+        }
+
+        private void checkExpand(int additionalLength)
+        {
+            if (this.length + additionalLength >= this.capacity)
+            {
+                this.expand(additionalLength);
+            }
+        }
+
+        private void expand(int min)
+        {
+            int newCapacity;
+
+            if ((this.capacity - this.length + min) < 2 * this.capacity - this.length)
+            {
+                newCapacity = 2 * this.capacity;
+            }
+            else
+            {
+                newCapacity = this.capacity + 2 * min;
+            }
+
+            Byte[] tmpArray = new Byte[newCapacity];
+            Array.Copy(this.data, tmpArray, this.length);
+
+            this.capacity = newCapacity;
+            this.data = tmpArray;
+        }
+
+        public void writeByte(Byte value)
+        {
+            this.checkExpand(1);
+            this.data[this.length++] = value;
+        }
+
+        public void writeUint32(UInt32 value)
+        {
+            this.checkExpand(4);
+            this.data[this.length++] = (Byte)(value >> 24);
+            this.data[this.length++] = (Byte)(value >> 16);
+            this.data[this.length++] = (Byte)(value >> 8);
+            this.data[this.length++] = (Byte)(value);
+        }
+
+        public void writeBytes(Byte[] values)
+        {
+            this.checkExpand(values.Length);
+            Array.Copy(values, 0, this.data, this.length, values.Length);
+            this.length += values.Length;
+        }
+
+        public void writeNameList(String[] values)
+        {
+            if (values != null)
+            {
+                String tmpString = String.Join(",", values);
+                this.writeUint32((UInt32)tmpString.Length);
+                this.writeBytes(Encoding.ASCII.GetBytes(tmpString));
+            }
+            else
+            {
+                this.writeUint32(0);
+            }
+        }
+
+        public void writeBoolean(Boolean value)
+        {
+            if (value)
+            {
+                this.writeByte(1);
+            }
+            else
+            {
+                this.writeByte(0);
+            }
+        }
+    }
 
     class Reader
     {
         private Byte[] data;
         private Int32 pos;
-        private Int32 length;
 
         public Reader(Byte[] _data)
         {
